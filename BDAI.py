@@ -53,3 +53,29 @@ graduation_mse = mean_squared_error(y_test_graduation, graduation_predictions)
 
 print("Placement Prediction Accuracy:", placement_accuracy)
 print("Year of Graduation Prediction MSE:", graduation_mse)
+
+# Create DataFrames for predictions
+placement_pred_df = pd.DataFrame({'Actual': y_test_placement, 'Predicted': placement_predictions})
+graduation_pred_df = pd.DataFrame({'Actual': y_test_graduation, 'Predicted': graduation_predictions})
+
+# Save predictions to CSV files
+placement_pred_df.to_csv('placement_predictions.csv', index=False)
+graduation_pred_df.to_csv('graduation_predictions.csv', index=False)
+
+# Create a combined DataFrame
+combined_pred_df = pd.DataFrame({
+    'Actual Placement': y_test_placement,
+    'Predicted Placement': placement_predictions,
+    'Actual Graduation': y_test_graduation,
+    'Predicted Graduation': graduation_predictions
+})
+
+# Save combined predictions to CSV file
+combined_pred_df.to_csv('combined_predictions.csv', index=False)
+
+# Evaluate models
+placement_accuracy = accuracy_score(y_test_placement, placement_predictions)
+graduation_mse = mean_squared_error(y_test_graduation, graduation_predictions)
+print("Placement Prediction Accuracy:", placement_accuracy)
+print("Year of Graduation Prediction MSE:", graduation_mse)
+
