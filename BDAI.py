@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
@@ -7,8 +6,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import accuracy_score, mean_squared_error
 
 # Load the datasets
-train_df = pd.read_csv('D:/BD-1/Prediction of Placement Status Data/BDAI/01 Train Data.csv')
-test_df = pd.read_csv('D:/BD-1/Prediction of Placement Status Data/BDAI/02 Test Data.csv')
+train_df = pd.read_csv('01 Train Data.csv')
+test_df = pd.read_csv('02 Test Data.csv')
 
 # Preprocess categorical features
 le = LabelEncoder()
@@ -30,7 +29,6 @@ X_train_placement.fillna(X_train_placement.mean(), inplace=True)
 X_test_placement.fillna(X_test_placement.mean(), inplace=True)
 X_train_graduation.fillna(X_train_graduation.mean(), inplace=True)
 X_test_graduation.fillna(X_test_graduation.mean(), inplace=True)
-
 y_train_placement.fillna(y_train_placement.mode()[0], inplace=True)
 y_test_placement.fillna(y_test_placement.mode()[0], inplace=True)
 y_train_graduation.fillna(y_train_graduation.median(), inplace=True)
@@ -40,42 +38,12 @@ y_test_graduation.fillna(y_test_graduation.median(), inplace=True)
 placement_model = RandomForestClassifier(n_estimators=100)
 placement_model.fit(X_train_placement, y_train_placement)
 
-graduation_model = LinearRegression()
-graduation_model.fit(X_train_graduation, y_train_graduation)
-
 # Make predictions
-placement_predictions = placement_model.predict(X_test_placement)
-graduation_predictions = graduation_model.predict(X_test_graduation)
+placement_predictions = placement_model.predict(test_df[features])
 
-# Evaluate models
-placement_accuracy = accuracy_score(y_test_placement, placement_predictions)
-graduation_mse = mean_squared_error(y_test_graduation, graduation_predictions)
+# Create a new DataFrame with the original columns and the predicted placement
+output_df = test_df.copy()
+output_df['Predicted Placement'] = placement_predictions
 
-print("Placement Prediction Accuracy:", placement_accuracy)
-print("Year of Graduation Prediction MSE:", graduation_mse)
-
-# Create DataFrames for predictions
-placement_pred_df = pd.DataFrame({'Actual': y_test_placement, 'Predicted': placement_predictions})
-graduation_pred_df = pd.DataFrame({'Actual': y_test_graduation, 'Predicted': graduation_predictions})
-
-# Save predictions to CSV files
-placement_pred_df.to_csv('placement_predictions.csv', index=False)
-graduation_pred_df.to_csv('graduation_predictions.csv', index=False)
-
-# Create a combined DataFrame
-combined_pred_df = pd.DataFrame({
-    'Actual Placement': y_test_placement,
-    'Predicted Placement': placement_predictions,
-    'Actual Graduation': y_test_graduation,
-    'Predicted Graduation': graduation_predictions
-})
-
-# Save combined predictions to CSV file
-combined_pred_df.to_csv('combined_predictions.csv', index=False)
-
-# Evaluate models
-placement_accuracy = accuracy_score(y_test_placement, placement_predictions)
-graduation_mse = mean_squared_error(y_test_graduation, graduation_predictions)
-print("Placement Prediction Accuracy:", placement_accuracy)
-print("Year of Graduation Prediction MSE:", graduation_mse)
-
+# Save the output DataFrame to a CSV file
+output_df.to_csv('output.csv', index=False)
