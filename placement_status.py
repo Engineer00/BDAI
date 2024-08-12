@@ -91,9 +91,9 @@ print("Confusion Matrix:")
 print(confusion_matrix(test_df[target_placement], best_model.predict(test_df[features])))
 
 # Feature importance
-feature_importances = best_model.feature_importances_
-print("Feature Importances:")
-for feature, importance in zip(features, feature_importances):
+feature_importance = best_model.feature_importance_
+print("Feature Importance:")
+for feature, importance in zip(features, feature_importance):
     print(f"{feature}: {importance:.2f}")
     
 accuracy = accuracy_score(test_df[target_placement], best_model.predict(test_df[features]))
@@ -101,15 +101,15 @@ print("Accuracy:", accuracy)
 accuracy_percentage = accuracy * 100
 print("Accuracy (%):", accuracy_percentage)
 
-# Plot feature importances
+# Plot feature importance
 plt.figure(figsize=(10, 6))
-plt.bar(features, feature_importances)
+plt.bar(features, feature_importance)
 plt.xlabel('Feature')
 plt.ylabel('Importance')
-plt.title('Feature Importances')
+plt.title('Feature Importance')
 plt.show()
 
 # Save the plot to a file
-plt.savefig('feature_importances_plot.png')
+plt.savefig('feature_importance_plot.png')
 
 print("Code execution completed successfully!")
