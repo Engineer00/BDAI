@@ -82,6 +82,10 @@ output_df = test_df.copy()
 output_df['Predicted Placement'] = placement_predictions
 output_df.to_csv('placement_predictions.csv', index=False)
 
+# Transform true labels to strings
+true_labels = ['placed' if x == 1 else 'not placed' for x in test_df[target_placement]]
+
+
 # Print the classification report
 print("Classification Report:")
 print(classification_report(test_df[target_placement], best_model.predict(test_df[features]), zero_division=0))
@@ -91,8 +95,8 @@ print("Confusion Matrix:")
 print(confusion_matrix(test_df[target_placement], best_model.predict(test_df[features])))
 
 # Feature importance
-feature_importance = best_model.feature_importance_
-print("Feature Importance:")
+feature_importance = best_model.feature_importances_
+print("Feature Importances:")
 for feature, importance in zip(features, feature_importance):
     print(f"{feature}: {importance:.2f}")
     
@@ -105,11 +109,12 @@ print("Accuracy (%):", accuracy_percentage)
 plt.figure(figsize=(10, 6))
 plt.bar(features, feature_importance)
 plt.xlabel('Feature')
-plt.ylabel('Importance')
-plt.title('Feature Importance')
-plt.show()
+plt.ylabel('Importance Score')  # Changed to "Importance Score"
+plt.title('Feature Importances')  # Changed to "Feature Importances"
+plt.savefig('feature_importances_plot.png')
+
 
 # Save the plot to a file
-plt.savefig('feature_importance_plot.png')
+plt.savefig('feature_importances_plot.png')
 
 print("Code execution completed successfully!")
