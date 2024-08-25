@@ -14,9 +14,8 @@ data['Created'] = pd.to_datetime(data['Created'])
 # Extract the year from the 'Created' column
 data['Created Year'] = data['Created'].dt.year
 
-# Handle missing values in the Academic Year column
-# Here, we'll drop rows with missing Academic Year values
-data = data.dropna(subset=['Academic Year'])
+# Handle missing values in the Academic Year column (Consider filling with a mode)
+data['Academic Year'] = data['Academic Year'].fillna(data['Academic Year'].mode()[0])
 
 # Preprocess categorical features
 data['New College Name'] = LabelEncoder().fit_transform(data['New College Name'])
@@ -24,29 +23,15 @@ data['Branch/ Specialisation'] = LabelEncoder().fit_transform(data['Branch/ Spec
 
 # Define the features (X) and target (y)
 X = data[['New College Name', 'Academic Year', 'Branch/ Specialisation']]
-
-# Calculate the graduation year
-data['Forecasted Graduation Year'] = data['Created Year'] + (4 - data['Academic Year'])
-
-# Print the first few rows to verify
-print(data[['Academic Year', 'Created Year', 'Forecasted Graduation Year']])
-
-# Define y as the calculated graduation year with dtype int
-y = data['Forecasted Graduation Year'].astype(int)
-
-# Remove NaN values from y
-y = y.dropna()
-
-# Remove corresponding rows from X
-X = X.loc[y.index]
+y = data['Created Year'] + (4 - data['Academic Year'])
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Define the hyperparameter grid for GridSearchCV
 param_grid = {
-    'n_estimators': [100],
-    'max_features': ['sqrt'],
+    'n_estimators': [100, 200, 300],
+    'max_features': ['sqrt', 'log2'],
     'max_depth': [None, 5, 10],
     'min_samples_split': [2, 5],
     'min_samples_leaf': [1, 5]
@@ -71,24 +56,16 @@ print(f'Mean Absolute Error (MAE): {mae:.2f}')
 print(f'R-Squared (R2): {r2:.2f}')
 
 # Use the trained model to forecast graduation year for all data and round to nearest whole number
-forecasted_graduation_year = grid_search.best_estimator_.predict(X).round()
-
-# Fill NaN values with 0 and convert to integers
-forecasted_graduation_year = np.nan_to_num(forecasted_graduation_year, nan=0).astype(int)
+forecasted_graduation_year = grid_search.best_estimator_.predict(X).round().astype(int)
 
 # Create a new DataFrame with all columns and the predicted graduation year
 output_df = data.copy()
-output_df['Forecasted Graduation Year'] = pd.Series(forecasted_graduation_year).reindex(output_df.index).fillna(0).astype(int)
+output_df['Forecasted Graduation Year'] = pd.Series(forecasted_graduation_year).fillna(0).astype(int)
 
-# Identify rows with 0 values in Forecasted Graduation Year
-zero_value_rows = output_df[output_df['Forecasted Graduation Year'] == 0]
-
-# Calculate actual graduation year for these rows
-for index, row in zero_value_rows.iterrows():
-    academic_year = row['Academic Year']
-    created_year = row['Created Year']
-    actual_graduation_year = created_year + (4 - academic_year)
-    output_df.loc[index, 'Forecasted Graduation Year'] = actual_graduation_year
+# Ensure no forecasted year is zero by recalculating where necessary
+output_df.loc[output_df['Forecasted Graduation Year'] == 0, 'Forecasted Graduation Year'] = (
+    output_df['Created Year'] + (4 - output_df['Academic Year'])
+)
 
 # Verify the changes
 print(output_df['Forecasted Graduation Year'])
