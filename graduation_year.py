@@ -26,7 +26,7 @@ data['Branch/ Specialisation'] = LabelEncoder().fit_transform(data['Branch/ Spec
 X = data[['New College Name', 'Academic Year', 'Branch/ Specialisation']]
 
 # Calculate the graduation year
-data['Forecasted Graduation Year'] = data['Created Year'] + (5 - data['Academic Year'])
+data['Forecasted Graduation Year'] = data['Created Year'] + (4 - data['Academic Year'])
 
 # Print the first few rows to verify
 print(data[['Academic Year', 'Created Year', 'Forecasted Graduation Year']])
