@@ -87,7 +87,7 @@ zero_value_rows = output_df[output_df['Forecasted Graduation Year'] == 0]
 for index, row in zero_value_rows.iterrows():
     academic_year = row['Academic Year']
     created_year = row['Created Year']
-    actual_graduation_year = created_year + (5 - academic_year)
+    actual_graduation_year = created_year + (4 - academic_year)
     output_df.loc[index, 'Forecasted Graduation Year'] = actual_graduation_year
 
 # Verify the changes
